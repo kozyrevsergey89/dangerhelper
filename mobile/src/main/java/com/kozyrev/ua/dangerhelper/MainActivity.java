@@ -1,25 +1,20 @@
 package com.kozyrev.ua.dangerhelper;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-
-import android.app.Activity;
 import android.app.ActionBar;
+import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.content.Intent;
-import android.content.IntentSender;
-import android.os.AsyncTask;
-import android.os.Handler;
-import android.support.v13.app.FragmentPagerAdapter;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.support.v13.app.FragmentPagerAdapter;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.view.ViewPager;
-import android.telephony.SmsManager;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,14 +22,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Locale;
 
 
 public class MainActivity extends Activity implements ActionBar.TabListener {
 
     private static final String TAG = "MainActivity";
+    public static final String WEAR_EXTRA = "wear_extra";
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -57,6 +53,10 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         setContentView(R.layout.activity_main);
 //        mHandler = new Handler();
 
+
+        if (getIntent().getStringExtra(WEAR_EXTRA) != null) {
+            Toast.makeText(this, "Notification feedback toast!!" + getIntent().getStringExtra(WEAR_EXTRA), Toast.LENGTH_SHORT).show();
+        }
         // Set up the action bar.
         final ActionBar actionBar = getActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
@@ -122,6 +122,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         // the ViewPager.
         mViewPager.setCurrentItem(tab.getPosition());
     }
+
 
     @Override
     public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
@@ -203,13 +204,43 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
             btn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if (edit.getText().toString()!=null && edit.getText().toString().length()>0) {
-                        SharedPrefsUtils.setStringPreference(getActivity(), "phone",  edit.getText().toString());
+                    if (edit.getText().toString() != null && edit.getText().toString().length() > 0) {
+                        SharedPrefsUtils.setStringPreference(getActivity(), "phone", edit.getText().toString());
                     }
+                }
+            });
+            Button fireNotificationBtn = (Button) rootView.findViewById(R.id.send_notification_btn);
+            fireNotificationBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    sendNotificationToWear();
                 }
             });
             return rootView;
         }
+
+        private void sendNotificationToWear() {
+            //step14
+            NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(getActivity());
+            Intent intent = new Intent(getActivity(), MainActivity.class);
+            intent.putExtra(WEAR_EXTRA, WEAR_EXTRA);
+            PendingIntent pendingIntent = PendingIntent.getActivity(getActivity(), 4, intent, 0);
+            NotificationCompat.WearableExtender extender = new NotificationCompat.WearableExtender();
+            extender.setBackground(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher))
+                    .setDisplayIntent(pendingIntent);
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(getActivity());
+            Notification notification = builder.setContentText("Just fired text from phone!)")
+                    .setContentTitle("Message")
+                    .setSubText("this is pretty long subtext...")
+                    .setSmallIcon(R.mipmap.ic_launcher)
+                    .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher))
+                    .extend(extender)
+                    .addAction(new NotificationCompat.Action(R.mipmap.ic_launcher, "send feedback", pendingIntent))
+                    .build();
+            notificationManagerCompat.notify(123, notification);
+
+        }
+
     }
 
     /**

@@ -37,4 +37,11 @@
         android:id="@+id/save_btn"
         android:layout_below="@id/input"/>
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Fire Notification on Wear!"
+        android:id="@+id/send_notification_btn"
+        android:layout_below="@id/save_btn"/>
+
 </RelativeLayout>

@@ -113,6 +113,7 @@ public class AnalogWatchFaceService extends CanvasWatchFaceService implements Se
     @Override
     public Engine onCreateEngine() {
         mHandler = new Handler();
+//        step10
         return new Engine();
     }
 
@@ -267,6 +268,7 @@ public class AnalogWatchFaceService extends CanvasWatchFaceService implements Se
             timeTresholdNano = TIME_THRESHOLD_NS_ONE;
 
             //DATA LAYER
+//            step3
             mGoogleApiClient = new GoogleApiClient.Builder(AnalogWatchFaceService.this)
                     .addApi(Wearable.API)
                     .addConnectionCallbacks(AnalogWatchFaceService.this)
@@ -310,6 +312,7 @@ public class AnalogWatchFaceService extends CanvasWatchFaceService implements Se
         }
 
         //once per minute
+//        step11
         @Override
         public void onTimeTick() {
             super.onTimeTick();
@@ -323,15 +326,15 @@ public class AnalogWatchFaceService extends CanvasWatchFaceService implements Se
                 Log.d(TAG, "onAmbientModeChanged: " + inAmbientMode);
             }
             mAmbient = inAmbientMode;
-
+//step12
             updateWatchHandStyle();
 
             /* Check and trigger whether or not timer should be running (only in active mode). */
             updateTimer();
         }
 
-        private void updateWatchHandStyle(){
-            if (mAmbient){
+        private void updateWatchHandStyle() {
+            if (mAmbient) {
                 mHourPaint.setColor(Color.WHITE);
                 mMinutePaint.setColor(Color.WHITE);
                 mSecondPaint.setColor(Color.WHITE);
@@ -438,6 +441,7 @@ public class AnalogWatchFaceService extends CanvasWatchFaceService implements Se
 
         @Override
         public void onDraw(Canvas canvas, Rect bounds) {
+//            step13
             if (Log.isLoggable(TAG, Log.VERBOSE)) {
                 Log.v(TAG, "onDraw");
             }
@@ -620,9 +624,6 @@ public class AnalogWatchFaceService extends CanvasWatchFaceService implements Se
     }
 
     private void onWristMoveDetected(boolean up) {
-        if (up) {
-            //return;
-        }
         renewPauseTimer();
         mCounter++;
         startCountDownTimer(mCounter);
@@ -696,6 +697,7 @@ public class AnalogWatchFaceService extends CanvasWatchFaceService implements Se
 
     @Override
     public void onConnected(Bundle connectionHint) {
+//        step4
         LOGD(TAG, "onConnected(): Successfully connected to Google API client");
         Wearable.DataApi.addListener(mGoogleApiClient, this);
         Wearable.MessageApi.addListener(mGoogleApiClient, this);
@@ -766,15 +768,15 @@ public class AnalogWatchFaceService extends CanvasWatchFaceService implements Se
         for (Node node : nodes.getNodes()) {
             results.add(node.getId());
         }
+//        step5
         return results;
     }
 
     public static final String SOS_MESSAGE_PATH = "/sos_action";
 
     private void requestSos() {
-        Log.i("123", "sending message");
         for (String sosNodeId : nodesIds) {
-            Log.i("123", "sending message inside");
+//            step6
             Wearable.MessageApi.sendMessage(mGoogleApiClient, sosNodeId,
                     SOS_MESSAGE_PATH, new byte[0]).setResultCallback(
                     new ResultCallback() {
@@ -782,7 +784,6 @@ public class AnalogWatchFaceService extends CanvasWatchFaceService implements Se
                         public void onResult(Result result) {
                             if (!result.getStatus().isSuccess()) {
                                 // Failed to send message
-                                Log.i("123", "failed to send message");
                             }
                         }
                     }

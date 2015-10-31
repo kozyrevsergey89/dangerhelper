@@ -87,6 +87,7 @@ public class MyService extends Service implements DataApi.DataListener,
     public void onConnected(Bundle connectionHint) {
         LOGD(TAG, "Google API Client was connected");
         mResolvingError = false;
+//        step7
         Wearable.DataApi.addListener(mGoogleApiClient, this);
         Wearable.MessageApi.addListener(mGoogleApiClient, this);
         Wearable.NodeApi.addListener(mGoogleApiClient, this);
@@ -121,6 +122,7 @@ public class MyService extends Service implements DataApi.DataListener,
             public void run() {
                 for (DataEvent event : events) {
                     if (event.getType() == DataEvent.TYPE_CHANGED) {
+//                        step9  -   getting datamap from dataitem
 //                        event.getDataItem().getUri();
 //                        event.getDataItem().getData();
 //                        DataMap dataMap = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
@@ -134,6 +136,7 @@ public class MyService extends Service implements DataApi.DataListener,
 
     @Override //MessageListener
     public void onMessageReceived(final MessageEvent messageEvent) {
+//        step8
         LOGD(TAG, "onMessageReceived() A message from watch was received:" + messageEvent
                 .getRequestId() + " " + messageEvent.getPath());
         if (messageEvent.getPath().equals(SOS_MESSAGE_PATH)) {
